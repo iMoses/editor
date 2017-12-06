@@ -1,0 +1,66 @@
+.scrollable {
+  position: relative;
+
+  &.relative {
+    .content {
+      position: relative;
+      right: auto;
+      bottom: auto;
+    }
+  }
+}
+
+.content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    background-color: transparent;
+  }
+}
+
+.track {
+  position: absolute;
+  background-color: rgba(#000, 0);
+  transition: background-color 400ms;
+
+  &:hover {
+    background-color: rgba(#000, .05);
+  }
+
+  &.x-axis {
+    left: 0;
+    right: 12px;
+    bottom: 0;
+
+    &.visible,
+    &.visible .thumb {
+      height: 10px;
+    }
+  }
+
+  &.y-axis {
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    &.visible,
+    &.visible .thumb {
+      width: 10px;
+    }
+  }
+}
+
+.thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(#000, .11);
+  box-shadow: inset 0 0 0 1px rgba(#000, .02);
+}

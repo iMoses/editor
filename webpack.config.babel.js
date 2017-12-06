@@ -8,14 +8,14 @@ const babelrc = JSON.parse(
 );
 babelrc.presets[0] = ['es2015', {modules: false}];
 
-const includePaths = [
-    path.resolve(__dirname, 'src/client'),
-    path.resolve(__dirname, 'src/shared'),
-];
-
-const publicPath = path.resolve(__dirname, 'public');
-
 export const config = {
+    paths: {
+        public: path.resolve(__dirname, 'public'),
+        client: path.resolve(__dirname, 'src/client'),
+        shared: path.resolve(__dirname, 'src/shared'),
+        js:     path.resolve(__dirname, 'public/js'),
+        css:    path.resolve(__dirname, 'public/css'),
+    },
     loaders: {
         babel: {
             loader: 'babel-loader',
@@ -44,6 +44,11 @@ export const config = {
     }
 };
 
+const includePaths = [
+    config.paths.client,
+    config.paths.shared,
+];
+
 
 export default [{
 
@@ -54,7 +59,7 @@ export default [{
 
     output: {
         filename: 'editor.js',
-        path: path.resolve(publicPath, 'js'),
+        path: config.paths.js,
         publicPath: '/js/',
     },
 
@@ -108,7 +113,7 @@ export default [{
         port: 3417,
         hot: true,
         noInfo: true,
-        contentBase: publicPath,
+        contentBase: config.paths.public,
         publicPath: '/',
         // proxy: {
         //     '*': 'http://localhost:8200/'
@@ -121,7 +126,7 @@ export default [{
 
     output: {
         filename: 'style.css',
-        path: path.resolve(publicPath, 'css'),
+        path: config.paths.css,
         publicPath: '/css/'
     },
 
@@ -132,7 +137,7 @@ export default [{
                 use: ExtractTextPlugin.extract({
                     fallback: 'style-loader',
                     use: [
-                        'css-loader',
+                        config.loaders.css,
                         config.loaders.postcss,
                         config.loaders.sass,
                     ],
