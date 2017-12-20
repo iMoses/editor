@@ -1,6 +1,9 @@
 import { AppContainer } from 'react-hot-loader';
-import ReactDOM from 'react-dom';
 import Layout from './layout/default';
+import { ReactDOM } from 'lib/react';
+import { useStrict } from 'mobx';
+
+useStrict(true);
 
 const render = Component => {
     ReactDOM.render(

@@ -1,0 +1,23 @@
+@mixin shortcut-hint($color: #000, $horizontal: true) {
+  position: relative;
+  font-style: normal;
+
+  &:before {
+    content: "";
+    display: block;
+    position: absolute;
+    @if $horizontal == true {
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+    }
+    @else {
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 1px;
+    }
+    background-color: $color;
+  }
+}

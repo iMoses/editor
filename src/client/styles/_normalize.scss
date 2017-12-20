@@ -1,0 +1,66 @@
+* {
+  &,
+  &:before,
+  &:after {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+  }
+  &:focus {
+    outline: 0;
+  }
+}
+
+html {
+  min-height: 100vh;
+  font-size: 10px;
+}
+
+body {
+  min-height: 100vh;
+  font-size: 1.4rem;
+  user-select: none;
+  overflow: hidden;
+  cursor: default;
+
+  [data-selectable] {
+    user-select: text;
+  }
+}
+
+ul {
+  list-style: none;
+}
+
+em {
+  font-style: normal;
+}
+
+pre {
+  overflow: auto;
+}
+
+kbd {
+  font-family: inherit;
+}
+
+a {
+  &,
+  &:link,
+  &:hover,
+  &:visited {
+    color: inherit;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  outline: 0;
+}
