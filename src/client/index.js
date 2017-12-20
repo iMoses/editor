@@ -1,5 +1,6 @@
 import { AppContainer } from 'react-hot-loader';
-import Layout from './layout/default';
+import Window from './widgets/interface/window';
+import system from './modules/system';
 import { ReactDOM } from 'lib/react';
 import { useStrict } from 'mobx';
 
@@ -8,16 +9,17 @@ useStrict(true);
 const render = Component => {
     ReactDOM.render(
         <AppContainer>
-            <Component />
+            <Component system={system} />
         </AppContainer>,
         document.getElementById('root'),
     );
 };
 
-render(Layout);
+render(Window);
 
 if (module.hot) {
     require('./styles/index.scss');  // listen to css changes
     (el => el.parentNode.removeChild(el))(document.getElementById('css-style'));
-    module.hot.accept('./layout/default', () => render(Layout));
+    module.hot.accept('./widgets/interface/window', () => render(Window));
+    module.hot.accept('./modules/system', () => render(Window));
 }

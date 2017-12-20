@@ -48,8 +48,6 @@ export default class ContextArea extends Component {
     };
 
     handleContextMenu = event => {
-        if (event.shiftKey) return;  // TODO: remove
-
         event.preventDefault();
         event.stopPropagation();
         if (this.props.onContextMenu) {
@@ -59,12 +57,17 @@ export default class ContextArea extends Component {
     };
 
     render() {
-        const { state: { position }, props: { contextId, contextMenu, setContext, ...props } } = this;
+        const {
+            state: { position },
+            props: { contextId, contextMenu, setContext, children, ...props }
+        } = this;
         return (
             <FocusTrap
                 {...props}
                 onFocus={this.handleFocus}
                 onContextMenu={this.handleContextMenu}>
+
+                {children}
 
                 {position && (
                     <ContextMenuRoot contextMenu={contextMenu} style={position} onClose={this.handleMenuClose} />

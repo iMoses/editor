@@ -2,6 +2,7 @@ import { observable, computed, action } from 'mobx';
 import ContextMenu from './context-menu';
 import BaseCommand from './base-command';
 import EventEmitter from 'events';
+import _ from 'lodash';
 
 export default class CommandsController extends EventEmitter {
 
@@ -65,6 +66,35 @@ export default class CommandsController extends EventEmitter {
             context:   this.serialized,
             selection: window.getSelection(),
         }, this.system);
+    }
+
+    @computed
+    get shortcuts() {
+        const shortcuts = {};
+        this.commandsMap.forEach(command => {
+            let { keys } = command;
+            if (keys) {
+                Array.isArray(keys) || (keys = [keys]);
+                keys.forEach(key => shortcuts[key.toLowerCase()] = command);
+            }
+        });
+        return shortcuts;
+    }
+
+    @computed
+    get shortcutsKeyMap() {
+        return _.reduce(this.shortcuts, (keyMap, command, shortcut) => {
+            keyMap[command.id] = shortcut;
+            return keyMap;
+        }, {});
+    }
+
+    @computed
+    get shortcutsHandlers() {
+        return _.reduce(this.shortcuts, (handlers, command) => {
+            handlers[command.id] = command.emit;
+            return handlers;
+        }, {});
     }
 
 }

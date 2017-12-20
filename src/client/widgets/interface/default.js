@@ -7,21 +7,13 @@ import ContextArea from 'widgets/context-area';
 @cssModules(require('./default.scss'))
 export default class DefaultLayout extends Component {
 
-    static childContextTypes = {
-        system: PropTypes.object,
-    };
-
-    getChildContext() {
-        return {system};
-    }
-
     render() {
         return (
-            <Provider key={Date.now()} {...system.di}>
-                <ContextArea component={HotKeys} className="layout">
-                    Default layout
-                </ContextArea>
-            </Provider>
+            <ContextArea className="layout">
+
+                <p>Default layout</p>
+
+            </ContextArea>
         );
     }
 
