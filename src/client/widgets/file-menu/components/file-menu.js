@@ -10,7 +10,7 @@ import MenuButton from './menu-button';
 export default class FileMenu extends Component {
 
     static propTypes = {
-        fileMenu: PropTypes.array,
+        contexts: PropTypes.array,
     };
 
     static keyMap = {
@@ -36,13 +36,13 @@ export default class FileMenu extends Component {
     }
 
     previous() {
-        const { state: { activeId }, props: { fileMenu } } = this;
-        this.setState({activeId: activeId === 0 ? fileMenu.length - 1 : activeId - 1});
+        const { state: { activeId }, props: { contexts } } = this;
+        this.setState({activeId: activeId === 0 ? contexts.length - 1 : activeId - 1});
     }
 
     next() {
-        const { state: { activeId }, props: { fileMenu } } = this;
-        this.setState({activeId: fileMenu.length - 1 === activeId ? 0 : activeId + 1});
+        const { state: { activeId }, props: { contexts } } = this;
+        this.setState({activeId: contexts.length - 1 === activeId ? 0 : activeId + 1});
     }
 
     handleClick(event, id) {
@@ -94,7 +94,7 @@ export default class FileMenu extends Component {
     }
 
     render() {
-        const { props: { fileMenu, contextsMap }, state: { activeId } } = this;
+        const { props: { contexts, contextsMap }, state: { activeId } } = this;
         return (
             <HotKeys
                 ref="trap"
@@ -106,7 +106,7 @@ export default class FileMenu extends Component {
                 onFocusEnter={e => this.handleFocusEnter(e)}
                 onFocusLeave={e => this.handleFocusLeave(e)}>
 
-                {fileMenu.map((contextId) => (
+                {contexts.map((contextId) => (
                     <MenuButton
                         key={contextId}
                         active={activeId === contextId}

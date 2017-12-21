@@ -8,11 +8,11 @@ export default class DefaultLayout extends Component {
 
     render() {
         return (
-            <div className="layout"
+            <section className="layout"
                  onContextMenu={e => e.shiftKey || e.preventDefault()}>
 
                 <header>
-                    <FileMenu fileMenu={[
+                    <FileMenu contexts={[
                         system.EDIT,
                         system.HELP,
                     ]} />
@@ -26,7 +26,7 @@ export default class DefaultLayout extends Component {
                     <div className="status-bar" />
                 </footer>
 
-            </div>
+            </section>
         );
     }
 

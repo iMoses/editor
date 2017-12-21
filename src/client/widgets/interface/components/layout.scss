@@ -7,8 +7,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  min-width: 1200px;
-  min-height: 600px;
+  //min-width: 1200px;
+  //min-height: 600px;
   overflow: hidden;
 
   > header,
@@ -18,6 +18,7 @@
 
   > section {
     flex: 1 1 auto;
+    position: relative;
   }
 }
 
