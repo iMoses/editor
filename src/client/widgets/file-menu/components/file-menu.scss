@@ -1,0 +1,27 @@
+@import "styles/blueprints";
+
+.file-menu {
+  height: 25px;
+  white-space: nowrap;
+  background-color: #e8e8e8;
+
+  > li {
+    display: inline-block;
+    position: relative;
+
+    &.active {
+      .menu-button {
+        color: #fff;
+        background-color: #3874d4;
+
+        em:before {
+          background-color: #fff;
+        }
+      }
+    }
+  }
+
+  em {
+    @include shortcut-hint(#000);
+  }
+}

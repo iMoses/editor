@@ -1,4 +1,6 @@
 .layout {
+  display: flex;
+  flex-direction: column;
   position: absolute;
   z-index: 0;
   top: 0;
@@ -8,4 +10,15 @@
   min-width: 1200px;
   min-height: 600px;
   overflow: hidden;
+
+  > header,
+  > footer {
+    flex: 0 0 auto;
+  }
+
+  > section {
+    flex: 1 1 auto;
+  }
 }
+
+

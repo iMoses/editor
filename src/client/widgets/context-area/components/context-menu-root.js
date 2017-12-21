@@ -43,7 +43,7 @@ export default class ContextMenuRoot extends Component {
         }
     }
 
-    handleClose() {
+    handleClose = () => {
         if (this.props.onClose) {
             this.props.onClose();
         }
@@ -51,20 +51,21 @@ export default class ContextMenuRoot extends Component {
         this.activeElement.focus();
             // this.system.contextMenu = false;
         // }
-    }
+    };
 
     render() {
         const { state: { style }, props: { contextMenu } } = this;
         return ReactDOM.createPortal((
             <HotKeys
                 keyMap={ContextMenuRoot.keyMap}
-                onFocusLeave={() => this.handleClose()}>
+                onFocusLeave={this.handleClose}>
 
                 <ContextMenu
                     style={style}
                     context={contextMenu}
                     ref={ref => this.contextMenu = ref}
                     onClose={backward => backward || this.handleClose()}
+                    autoFocus
                 />
 
             </HotKeys>

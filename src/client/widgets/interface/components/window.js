@@ -1,8 +1,7 @@
-import { Component, PropTypes, observer, Provider } from 'lib/react';
+import { Component, PropTypes, Provider } from 'lib/react';
 import HotKeys from 'components/hot-keys';
-import Layout from './default';
+import Layout from './layout';
 
-@observer
 export default class Application extends Component {
 
     static windowEvents = [
@@ -29,14 +28,16 @@ export default class Application extends Component {
         this.eventHandlers = {};
         const { system } = this.props;
         Application.windowEvents.forEach(event =>
-            window.addEventListener(
-                event, this.eventHandlers[event] = system.emit.bind(system, event)
-            ));
+            window.addEventListener(event,
+                this.eventHandlers[event] = system.emit.bind(system, event)
+            )
+        );
     }
 
     componentWillUnmount() {
         Application.windowEvents.forEach(event =>
-            window.removeEventListener(event, this.eventHandlers[event]));
+            window.removeEventListener(event, this.eventHandlers[event])
+        );
     }
 
     render() {

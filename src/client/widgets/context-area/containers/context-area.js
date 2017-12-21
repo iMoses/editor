@@ -1,8 +1,7 @@
-import ContextMenuRoot from '../components/context-menu-root';
 import { Component, PropTypes, observer, inject } from 'lib/react';
+import ContextMenuRoot from '../components/context-menu-root';
 import FocusTrap from 'components/focus-trap';
 import Collection from 'lib/collection';
-import { observe } from 'mobx';
 
 @inject(({ system }) => ({
     setContext:  system.commands.update,
@@ -33,7 +32,11 @@ export default class ContextArea extends Component {
     constructor(props) {
         super(...arguments);
         this.state = {position: null};
-        observe(this.targets, this.updateContext);
+        this.disposer = this.targets.observe(this.updateContext);
+    }
+
+    componentWillUnmount() {
+        this.disposer();
     }
 
     updateContext = () =>
@@ -53,7 +56,9 @@ export default class ContextArea extends Component {
         if (this.props.onContextMenu) {
             this.props.onContextMenu(event);
         }
-        this.setState({position: {top: event.clientY, left: event.clientX}});
+        if (this.props.contextMenu) {
+            this.setState({position: {top: event.clientY, left: event.clientX}});
+        }
     };
 
     render() {

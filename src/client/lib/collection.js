@@ -1,4 +1,4 @@
-import { observable, computed, action, toJS } from 'mobx';
+import { observable, computed, action, observe, toJS } from 'mobx';
 
 export default class Collection {
 
@@ -51,6 +51,10 @@ export default class Collection {
 
     forEach(func) {
         return this.entries.forEach(func);
+    }
+
+    observe(func) {
+        return observe(this.entries, func);
     }
 
 }
