@@ -6,9 +6,6 @@ export default function bootstrap(modules) {
     const contexts = [];
 
     _.each(modules, (module, moduleName) => {
-        if (module.controller) {
-            controllers[moduleName] = module.controller;
-        }
         if (module.commands) {
             commands.push(...module.commands);
         }

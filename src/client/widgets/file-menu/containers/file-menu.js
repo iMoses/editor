@@ -1,9 +1,9 @@
 import { Component, PropTypes, cssModules, observer, inject } from 'lib/react';
+import MenuButton from '../components/menu-button';
 import HotKeys from 'components/hot-keys';
-import MenuButton from './menu-button';
 
-@inject(({ system }) => ({
-    contextsMap: system.commands.contextsMap,
+@inject(({ controllers: { commands } }) => ({
+    contextsMap: commands.contextsMap,
 }))
 @observer
 @cssModules(require('./file-menu.scss'))

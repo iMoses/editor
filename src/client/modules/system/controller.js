@@ -1,7 +1,8 @@
 import bootstrap from './bootstrap';
 import * as modules from 'modules';
 import EventEmitter from 'events';
-import _ from 'lodash';
+import IOC from 'lib/ioc';
+// import _ from 'lodash';
 
 export default class SystemController extends EventEmitter {
 
@@ -10,23 +11,14 @@ export default class SystemController extends EventEmitter {
 
         window.system = this;
 
-        const { controllers, commands, contexts } = bootstrap(modules);
+        this.di = IOC.container;
+        IOC.constant('system', this);
 
-        _.each(controllers, (controller, name) => {
-            if (name in this) {
-                throw Error(`system collision detected, "${name}" controller can't be instantiated`);
-            }
-            this[name] = new controller(this);
-        });
+        const { commands, contexts } = bootstrap(modules);
 
-        this.commands.registerCommands(commands);
-        this.commands.registerContexts(contexts);
-    }
-
-    get di() {
-        return {
-            system: this,
-        };
+        this.di.controllers.commands
+            .registerCommands(commands)
+            .registerContexts(contexts);
     }
 
 }

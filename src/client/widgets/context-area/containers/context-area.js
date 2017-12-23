@@ -3,9 +3,9 @@ import ContextMenuRoot from '../components/context-menu-root';
 import FocusTrap from 'components/focus-trap';
 import Collection from 'lib/collection';
 
-@inject(({ system }) => ({
-    setContext:  system.commands.update,
-    contextMenu: system.commands.contextMenu,
+@inject(({ controllers: { commands } }) => ({
+    setContext:  commands.update,
+    contextMenu: commands.contextMenu,
 }))
 @observer
 export default class ContextArea extends Component {

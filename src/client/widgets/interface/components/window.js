@@ -2,7 +2,7 @@ import { Component, PropTypes, Provider } from 'lib/react';
 import HotKeys from 'components/hot-keys';
 import Layout from './layout';
 
-export default class Application extends Component {
+export default class Window extends Component {
 
     static windowEvents = [
         'blur',
@@ -27,7 +27,7 @@ export default class Application extends Component {
     componentDidMount() {
         this.eventHandlers = {};
         const { system } = this.props;
-        Application.windowEvents.forEach(event =>
+        Window.windowEvents.forEach(event =>
             window.addEventListener(event,
                 this.eventHandlers[event] = system.emit.bind(system, event)
             )
@@ -35,19 +35,20 @@ export default class Application extends Component {
     }
 
     componentWillUnmount() {
-        Application.windowEvents.forEach(event =>
+        Window.windowEvents.forEach(event =>
             window.removeEventListener(event, this.eventHandlers[event])
         );
     }
 
     render() {
         const { system } = this.props;
+        const { commands } = system.di.controllers;
         return (
             <Provider key={Date.now()} {...system.di}>
                 <HotKeys
                     component={Layout}
-                    keyMap={system.commands.shortcutsKeyMap}
-                    handlers={system.commands.shortcutsHandlers}
+                    keyMap={commands.shortcutsKeyMap}
+                    handlers={commands.shortcutsHandlers}
                 />
             </Provider>
         );

@@ -2,8 +2,10 @@ import { observable, computed, action } from 'mobx';
 import ContextMenu from './context-menu';
 import BaseCommand from './base-command';
 import EventEmitter from 'events';
+import { service } from 'lib/ioc';
 import _ from 'lodash';
 
+@service
 export default class CommandsController extends EventEmitter {
 
     @observable context = {

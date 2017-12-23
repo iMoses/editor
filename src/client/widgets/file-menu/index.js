@@ -1,1 +1,1 @@
-export default from './components/file-menu';
+export default from './containers/file-menu';
