@@ -1,5 +1,6 @@
 import Bottle from 'bottlejs';
 
+const factoryRegex = /^(.+)(Factory)$/;
 const postfixRegex = /^(.+)(Controller|Service)$/;
 
 export default class IOC {
@@ -12,7 +13,7 @@ export default class IOC {
 
     static initialize() {
         IOC.di = new Bottle;
-        IOC.di.constant('di', IOC.di.container);
+        IOC.di.constant('di', IOC.container);
     }
 
     static constant() {
@@ -21,25 +22,30 @@ export default class IOC {
 
     static normalizeName = name => name.charAt(0).toLowerCase() + name.slice(1);
 
-    static service(Constructor, ...dependencies) {
+    static register(func, ...rest) {
+        let matches;
+        if (matches = factoryRegex.exec(func.name)) {
+            let name = IOC.normalizeName(matches[1]);
+            return IOC.di.factory(`${name}.factory`, () => func(IOC.container, ...rest));
+        }
+
         const service = (name, ns) => {
             name = IOC.normalizeName(name);
-            IOC.di.service(ns ? `${ns}.${name}` : name, Constructor, ...dependencies);
+            IOC.di.service(ns ? `${ns}.${name}` : name, func, ...rest);
         };
 
-        let matches;
-        if (matches = postfixRegex.exec(Constructor.name)) {
+        if (matches = postfixRegex.exec(func.name)) {
             return service(matches[1], `${matches[2].toLowerCase()}s`);
         }
 
-        return service(Constructor.name);
+        return service(func.name);
     }
 
 }
 
 IOC.initialize();
 
-export const service = decorator(IOC.service);
+export const register = decorator(IOC.register);
 
 export function decorator(func) {
     return function(Constructor) {
