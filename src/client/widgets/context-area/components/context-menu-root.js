@@ -1,6 +1,7 @@
 import { Component, PropTypes, ReactDOM, observer } from 'lib/react';
 import ContextMenu from './context-menu';
 import HotKeys from 'components/hot-keys';
+import _ from 'lodash';
 
 @observer
 export default class ContextMenuRoot extends Component {
@@ -26,20 +27,27 @@ export default class ContextMenuRoot extends Component {
         this.activeElement = document.activeElement;
     }
 
-    componentDidUpdate(prevProps) {
-        const { style } = this.props;
-        if (style && style !== prevProps.style) {
-            const menuNode = ReactDOM.findDOMNode(this.contextMenu);
-            this.setState({
-                style: {
-                    top:  Math.min(style.top, window.innerHeight - menuNode.offsetHeight),
-                    left: Math.min(style.left, window.innerWidth - menuNode.offsetWidth),
-                },
-            });
-            if (menuNode !== document.activeElement) {
-                this.activeElement = document.activeElement;
-                this.contextMenu.clear();
-            }
+    componentDidMount() {
+        this.updateStyle(this.props.style);
+    }
+
+    componentWillUpdate(nextProps) {
+        if (!_.isEqual(nextProps.style, this.props.style)) {
+            this.updateStyle(nextProps.style);
+        }
+    }
+
+    updateStyle(style) {
+        const menuNode = ReactDOM.findDOMNode(this.contextMenu);
+        this.setState({
+            style: {
+                top:  Math.min(style.top, window.innerHeight - menuNode.offsetHeight),
+                left: Math.min(style.left, window.innerWidth - menuNode.offsetWidth),
+            },
+        });
+        if (menuNode !== document.activeElement) {
+            this.activeElement = document.activeElement;
+            this.contextMenu.clear();
         }
     }
 
@@ -47,10 +55,7 @@ export default class ContextMenuRoot extends Component {
         if (this.props.onClose) {
             this.props.onClose();
         }
-        // if (this.system.contextMenu) {
         this.activeElement.focus();
-            // this.system.contextMenu = false;
-        // }
     };
 
     render() {

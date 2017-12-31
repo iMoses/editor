@@ -40,8 +40,12 @@ export default class BaseCommand {
         if (this.keys === null) {
             return null;
         }
-        const keys = Array.isArray(this.keys) ? this.keys[0] : this.keys;
-        return _.capitalize(keys).replace(/\s+/g, '+');
+        const keys = (
+            Array.isArray(this.keys)
+                ? this.keys[0]
+                : this.keys
+        ).split(/\s+/);
+        return keys.map(_.capitalize).join('+');
     }
 
 }

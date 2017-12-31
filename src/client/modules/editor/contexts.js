@@ -1,16 +1,15 @@
 import * as commands from './commands';
 
-export const DEFAULT = 'default';
+export const CANVAS = 'editor.canvas';
 
 export default [
     {
-        id:     DEFAULT,
-        title:  'E_dit',
+        id:     CANVAS,
+        title:  'V_iew',
         groups: [
             {
                 items: [
-                    commands.UNDO,
-                    commands.REDO,
+                    commands.TOGGLE_GRID,
                 ],
             },
         ],

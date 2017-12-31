@@ -1,5 +1,6 @@
 import { Component, cssModules } from 'lib/react';
 import ContextArea from 'widgets/context-area';
+import { EditorCanvas } from 'widgets/editor';
 import FileMenu from 'widgets/file-menu';
 import * as system from 'modules/system';
 
@@ -14,12 +15,15 @@ export default class DefaultLayout extends Component {
                 <header>
                     <FileMenu contexts={[
                         system.EDIT,
+                        system.VIEW,
                         system.HELP,
                     ]} />
                 </header>
 
                 <ContextArea component="section" autoFocus>
-                    Default layout
+
+                    <EditorCanvas />
+
                 </ContextArea>
 
                 <footer>

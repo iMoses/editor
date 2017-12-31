@@ -1,6 +1,8 @@
 import * as commands from '../commands';
+import * as editor from '../../editor';
 
 export const EDIT = 'system.file-menu.edit';
+export const VIEW = 'system.file-menu.view';
 export const HELP = 'system.file-menu.help';
 
 export default [
@@ -12,6 +14,17 @@ export default [
                 items: [
                     commands.UNDO,
                     commands.REDO,
+                ],
+            },
+        ],
+    },
+    {
+        id:     VIEW,
+        title:  'V_iew',
+        groups: [
+            {
+                items: [
+                    editor.TOGGLE_GRID,
                 ],
             },
         ],

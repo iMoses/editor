@@ -1,29 +1,27 @@
-import {
-    view, project,
-    Group, Layer, Project, Tool,
-    Path, Point, Segment, Size, Symbol, PointText
-} from 'paper';
-
-import { draw, lightSource } from './tools';
+import { Group, Layer, Project, Path, Point, Segment, Size, Symbol, PointText } from 'paper';
 import { intersection } from './math';
 import { SquareGrid } from './view';
+import * as tools from './tools';
 
-export class Editor extends Project {
+export default class Editor extends Project {
 
     static defaultOptions = {
-        width:    25,
-        height:   25,
         tileSize: 32,
         showGrid: true,
     };
 
     constructor(element, settings = {}) {
         super(element);
-        this.tools = {draw, lightSource};
+        console.log(this);
+        this.tools = tools;
         this.settings = {...Editor.defaultOptions, ...settings};
+        this.update();
+    }
+
+    update() {
         this.updateView();
         this.updateGrid();
-        view.draw();
+        this.view.draw();
     }
 
     updateGrid() {
@@ -38,8 +36,8 @@ export class Editor extends Project {
     }
 
     updateView() {
-        const { width, height, tileSize } = this.settings;
-        view.viewSize   = new Size(tileSize * width, tileSize * height);
+        const { offsetWidth: width, offsetHeight: height } = this.view.element;
+        this.view.viewSize   = new Size(width, height);
         this.boundaries = [
             new Path.Line({from: [0, 0], to: [width, 0], visible: false}),
             new Path.Line({from: [width, 0], to: [width, height], visible: false}),
@@ -49,7 +47,7 @@ export class Editor extends Project {
     }
 
     test() {
-        const { width, height } = view.bounds;
+        const { width, height } = this.view.bounds;
         const { lines } = this.tools.draw;
         const { path: { bounds: { center } } } = this.tools.lightSource;
 
@@ -59,7 +57,7 @@ export class Editor extends Project {
         var intersects = [];
 
         if (this.lines) this.lines.remove();
-        if (!center.isInside(view.bounds)) return;
+        if (!center.isInside(this.view.bounds)) return;
 
         this.lines = new Group(this.boundaries);
 
@@ -124,7 +122,7 @@ export class Editor extends Project {
 
         // console.log(segments.length);
 
-        view.draw();
+        this.view.draw();
     }
 
 }
