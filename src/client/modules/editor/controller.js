@@ -6,9 +6,11 @@ import { Project } from './models';
 @register
 export default class EditorController {
 
+    static minZoom = 0.5;
+    static maxZoom = 3.5;
+
     @observable tileSize   = 32;
     @observable tileShape  = 32;
-    @observable zoom       = 1;
 
     @observable showGrid   = true;
     @observable snapToGrid = true;
@@ -32,6 +34,20 @@ export default class EditorController {
             this.activeProjectId = projectId,
             new Project(element, this, tools)
         );
+    }
+
+    @action.bound
+    handleZoomEvent(event) {
+        const project = this.activeProject;
+        const { minZoom, maxZoom } = this.constructor;
+        const zoom = project.view.zoom + (event.deltaY > 0 ? .1 : -.1);
+
+        project.adjustZoom(
+            Math.max(Math.min(zoom, maxZoom), minZoom),
+            project.view.getEventPoint(event)
+        );
+
+        project.update(this);
     }
 
     @action.bound

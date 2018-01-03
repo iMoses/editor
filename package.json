@@ -29,6 +29,7 @@
     "bottlejs": "^1.6.3",
     "classnames": "^2.2.5",
     "config": "^1.28.1",
+    "immutable": "^3.8.2",
     "lodash": "^4.17.4",
     "mobx": "^3.4.0",
     "mobx-react": "^4.3.5",
