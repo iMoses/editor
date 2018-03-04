@@ -25,7 +25,6 @@ export default class EditorCanvas extends Component {
     }
 
     render() {
-        // return <section className="editor-canvas"><canvas ref={ref => this.canvas = ref} /></section>;
         return (
             <ContextArea
                 component="section"

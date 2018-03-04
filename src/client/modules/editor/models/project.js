@@ -15,14 +15,19 @@ export default class ProjectModel extends Project {
 
         this.grid = new SquareGrid(this);
 
-        this.view.on('mousedown', this.handleMouseDown);
+        this.handleResize({size: this.view.bounds});
+
+        this.view.on({
+            resize:    this.handleResize,
+            mousedown: this.handleMouseDown,
+        });
 
         this.update(settings);
     }
 
-    // @computed
+    @computed
     get boundaries() {
-        const { width, height } = this.view.bounds;
+        const { width, height } = this;
         return [
             new Path.Line({from: [0, 0], to: [width, 0], visible: false}),
             new Path.Line({from: [width, 0], to: [width, height], visible: false}),
@@ -72,7 +77,16 @@ export default class ProjectModel extends Project {
     }
 
     @action.bound
+    handleResize({ size: { width, height } }) {
+        this.width  = width;
+        this.height = height;
+    }
+
+    @action.bound
     handleMouseDown(event) {
+        // make paper.js play nicely with React synthetic events
+        event.event.preventDefault = () => {};
+
         if (!event.modifiers.space) return true;
 
         let last = this.view.projectToView(event.point);
@@ -84,10 +98,9 @@ export default class ProjectModel extends Project {
             last = point;
         };
 
-        const handleMouseUp = event => {
+        const handleMouseUp = () => {
             this.view.off('mousedrag', handleMouseDrag);
             this.view.off('mouseup', handleMouseUp);
-
         };
 
         this.view.on('mousedrag', handleMouseDrag);
