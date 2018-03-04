@@ -22,6 +22,7 @@ export default class Editor extends Project {
         this.updateView();
         this.updateGrid();
         this.view.draw();
+        console.log('update');
     }
 
     updateGrid() {

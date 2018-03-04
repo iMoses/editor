@@ -63,3 +63,7 @@ typings/
 # IntelliJ project files
 .idea
 *.iml
+out/
+public/css/
+public/img/
+public/js/

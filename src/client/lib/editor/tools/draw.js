@@ -1,10 +1,7 @@
-import {
-    view, project,
-    Group, Layer, Project, Tool,
-    Path, Point, Segment, Size, Symbol, PointText
-} from 'paper';
+import { Group, Path } from 'paper';
+import BaseTool from './base';
 
-export default class DrawTool extends Tool {
+export default class DrawTool extends BaseTool {
 
     constructor() {
         super(...arguments);
@@ -21,6 +18,7 @@ export default class DrawTool extends Tool {
                 this.lines = new Group({name: 'lines', children: []})
             ]
         });
+        // console.log(this.group, this.lines);
     }
 
     onMouseDown(event) {

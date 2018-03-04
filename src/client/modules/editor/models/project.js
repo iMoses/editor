@@ -10,20 +10,19 @@ export default class ProjectModel extends Project {
 
     @observable.ref center;
 
-    constructor(element, settings, tools) {
+    constructor(element, settings) {
         super(element);
 
-        this.tools = tools;
-        this.grid  = new SquareGrid(this);
+        this.grid = new SquareGrid(this);
 
         this.view.on('mousedown', this.handleMouseDown);
 
         this.update(settings);
     }
 
-    @computed
+    // @computed
     get boundaries() {
-        const { width, height } = this;
+        const { width, height } = this.view.bounds;
         return [
             new Path.Line({from: [0, 0], to: [width, 0], visible: false}),
             new Path.Line({from: [width, 0], to: [width, height], visible: false}),
@@ -32,29 +31,19 @@ export default class ProjectModel extends Project {
         ];
     }
 
-    @action.bound
-    handleMouseDown(event) {
-        if (!event.modifiers.space) return;
+    update({ tools: { draw } }) {
+        const { offsetWidth, offsetHeight } = this.view.element;
 
-        let last = this.view.projectToView(event.point);
+        this.setSize(offsetWidth, offsetHeight);
 
-        const handleMouseDrag = event => {
-            const point = this.view.projectToView(event.point);
-            this.view.translate(
-                event.point.subtract(this.view.viewToProject(last))
-            );
-            this.grid.update();
-            last = point;
-        };
+        this.grid.update();
+        this.view.update();
+    }
 
-        const handleMouseUp = event => {
-            this.view.off('mousedrag', handleMouseDrag);
-            this.view.off('mouseup', handleMouseUp);
-
-        };
-
-        this.view.on('mousedrag', handleMouseDrag);
-        this.view.on('mouseup', handleMouseUp);
+    setSize(width, height) {
+        if (width !== this.width || height !== this.height) {
+            this.view.viewSize = new Size(width, height);
+        }
     }
 
     adjustZoom(zoomValue, zoomCenter) {
@@ -82,19 +71,27 @@ export default class ProjectModel extends Project {
         if (h > viewSize.height) this.view.center = center.subtract(new Point(0, h - viewSize.height));
     }
 
-    setSize(width, height) {
-        if (width !== this.width || height !== this.height) {
-            this.view.viewSize = new Size(width, height);
-        }
-    }
+    @action.bound
+    handleMouseDown(event) {
+        if (!event.modifiers.space) return true;
 
-    update({ zoom }) {
-        const { offsetWidth, offsetHeight } = this.view.element;
+        let last = this.view.projectToView(event.point);
 
-        this.setSize(offsetWidth, offsetHeight);
+        const handleMouseDrag = event => {
+            const point = this.view.projectToView(event.point);
+            this.view.translate(event.point.subtract(this.view.viewToProject(last)));
+            this.grid.update();
+            last = point;
+        };
 
-        this.grid.update();
-        this.view.update();
+        const handleMouseUp = event => {
+            this.view.off('mousedrag', handleMouseDrag);
+            this.view.off('mouseup', handleMouseUp);
+
+        };
+
+        this.view.on('mousedrag', handleMouseDrag);
+        this.view.on('mouseup', handleMouseUp);
     }
 
 }

@@ -1,7 +1,7 @@
 import Bottle from 'bottlejs';
 
-const factoryRegex = /^(.+)(Factory)$/;
-const postfixRegex = /^(.+)(Controller|Service)$/;
+const factoryRegex = /^(.+)(Factory|Singleton)$/;
+const postfixRegex = /^(.+)(Controller|Service|Store)$/;
 
 export default class IOC {
 

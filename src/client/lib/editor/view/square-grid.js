@@ -53,7 +53,6 @@ export default class SquareGrid {
 
         const children = [];
 
-
         for (let i = 0; i < cols; i++) {
             children.push(
                 (i % 5 === vOffset ? vSymbolBold : vSymbol).place([ adjust(left) + i * tileSize, top  ])

@@ -5,12 +5,23 @@ export default styles => Component => isStateless(Component)
     ? props => transformElement(Component(props), classNames.bind(styles))
     : class extends Component { render() { return transformElement(super.render(), classNames.bind(styles)); } };
 
+function extend(obj, prop, value) {
+    obj && (obj[prop] = value);
+    return obj;
+}
+
 function transformElement(el, cx) {
-    let className = el && el.props.className;
+    if (!el || !el.props) {
+        // no props currently means that this is in fact a portal, not an element
+        // therefore we only transform the children, we cannot clone it
+        return extend(el, 'children', recursiveTransform(el.children, cx));
+    }
+
+    let className = el.props.className;
     if (className) {
         className = cx(splitStrings(className));
     }
-    return el && React.cloneElement(el, {...el.props, className}, recursiveTransform(el.props.children, cx));
+    return React.cloneElement(el, {...el.props, className}, recursiveTransform(el.props.children, cx));
 }
 
 function splitStrings(className) {

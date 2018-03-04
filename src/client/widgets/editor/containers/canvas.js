@@ -1,6 +1,5 @@
 import { Component, cssModules, inject } from 'lib/react';
 import ContextArea from 'widgets/context-area';
-import Editor from 'lib/editor';
 
 @inject(({ system, controllers: { editor } }) => ({
     editor,
@@ -10,9 +9,11 @@ import Editor from 'lib/editor';
 export default class EditorCanvas extends Component {
 
     componentDidMount() {
-        const { editor } = this.props;
+        const { editor, system } = this.props;
         editor.createProject('projectId', this.canvas);
-        // editor.tools['light-tool'].tool.on('mousemove', () => editor.test());
+        window.editor = editor;
+        window.paper = system.di.paper;
+        editor.tools.draw.activate();
     }
 
     handleWheel(event) {
@@ -24,6 +25,7 @@ export default class EditorCanvas extends Component {
     }
 
     render() {
+        // return <section className="editor-canvas"><canvas ref={ref => this.canvas = ref} /></section>;
         return (
             <ContextArea
                 component="section"
