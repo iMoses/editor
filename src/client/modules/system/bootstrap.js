@@ -1,11 +1,10 @@
 import _ from 'lodash';
 
 export default function bootstrap(modules) {
-    const controllers = {};
     const commands = [];
     const contexts = [];
 
-    _.each(modules, (module, moduleName) => {
+    _.each(modules, module => {
         if (module.commands) {
             commands.push(...module.commands);
         }
@@ -14,5 +13,5 @@ export default function bootstrap(modules) {
         }
     });
 
-    return {controllers, commands, contexts};
+    return {commands, contexts};
 }

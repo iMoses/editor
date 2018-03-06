@@ -15,12 +15,27 @@
   > footer {
     flex: 0 0 auto;
   }
+}
 
+.main-screen {
+  display: flex;
+  flex: 1 1 auto;
+
+  > aside,
   > section {
-    flex: 1 1 auto;
     position: relative;
     overflow: hidden;
   }
+
+  > aside {
+    width: 24rem;
+    flex: 0 0 auto;
+  }
+
+  > section {
+    flex: 1 1 auto;
+  }
+
 }
 
 

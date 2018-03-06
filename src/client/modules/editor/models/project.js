@@ -1,6 +1,6 @@
 import { Group, Layer, Project, Path, Point, Segment, Size, Symbol, PointText } from 'paper';
 import { observable, computed, action } from 'mobx';
-import { SquareGrid } from 'lib/editor/view';
+import { SquareGrid } from 'modules/editor/view';
 
 export default class ProjectModel extends Project {
 

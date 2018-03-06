@@ -14,6 +14,10 @@ export default class Window extends Component {
         'storage',
     ];
 
+    static propTypes = {
+        system: PropTypes.object.isRequired,
+    };
+
     static childContextTypes = {
         system: PropTypes.object.isRequired,
     };
@@ -28,9 +32,9 @@ export default class Window extends Component {
         this.eventHandlers = {};
         const { system } = this.props;
         Window.windowEvents.forEach(event =>
-            window.addEventListener(event,
+            window.addEventListener(event, (
                 this.eventHandlers[event] = system.emit.bind(system, event)
-            )
+            ))
         );
     }
 

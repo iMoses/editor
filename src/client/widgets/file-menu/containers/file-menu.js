@@ -22,7 +22,7 @@ export default class FileMenu extends Component {
         select:   ['enter', 'space'],
     };
 
-    constructor(props) {
+    constructor() {
         super(...arguments);
         this.state = {activeId: -1, focus: false};
         this.handlers = {

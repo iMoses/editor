@@ -3,7 +3,9 @@ import React from 'react';
 
 export default styles => Component => isStateless(Component)
     ? props => transformElement(Component(props), classNames.bind(styles))
-    : class extends Component { render() { return transformElement(super.render(), classNames.bind(styles)); } };
+    : class WrappedComponent extends Component {
+        render() { return transformElement(super.render(), classNames.bind(styles)); }
+    };
 
 function extend(obj, prop, value) {
     obj && (obj[prop] = value);
