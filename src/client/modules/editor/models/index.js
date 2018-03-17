@@ -1,1 +1,1 @@
-export Project from './project';
+export LightSource from './light-source';

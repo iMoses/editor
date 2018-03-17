@@ -11,17 +11,16 @@ export default class EditorCanvas extends Component {
     componentDidMount() {
         const { editor, system } = this.props;
         editor.createProject('projectId', this.canvas);
+        editor.tools.draw.activate();
+
         window.editor = editor;
         window.paper = system.di.paper;
-        editor.tools.draw.activate();
     }
 
     handleWheel(event) {
         event.preventDefault();
         const { editor } = this.props;
-        if (event.ctrlKey) {
-            editor.handleZoomEvent(event);
-        }
+        event.ctrlKey && editor.handleZoomEvent(event);
     }
 
     render() {

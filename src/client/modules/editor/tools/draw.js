@@ -1,55 +1,34 @@
-import { Group, Path } from 'paper';
+import { observable, computed, action } from 'mobx';
 import BaseTool from './base';
+import { Path } from 'paper';
 
 export default class DrawTool extends BaseTool {
 
-    constructor() {
-        super(...arguments);
+    @observable strokeColor = 'black';
+    @observable strokeWidth = 1;
 
-        this.group = new Group({
-            name: 'draw-tool',
-            children: [
-                this.rect = new Path.Rectangle({
-                    name: 'draw-mark',
-                    size: [6, 6],
-                    point: [0, 0],
-                    fillColor: 'rgba(0, 0, 255, .2)'
-                }),
-                this.lines = new Group({name: 'lines', children: []})
-            ]
-        });
-        // console.log(this.group, this.lines);
+    @observable flattenBy = 10;
+
+    @computed
+    get style() {
+        const { strokeColor, strokeWidth } = this;
+        return {strokeColor, strokeWidth};
     }
 
     onMouseDown(event) {
-        this.path = new Path({strokeColor: 'black'});
-        this.path.add(this.convertPoint(event.point));
-        this.lines.addChild(this.path);
-    }
-
-    onMouseMove(event) {
-        this.rect.position = this.convertPoint(event.point);
+        this.path = new Path(this.style);
+        this.path.add(event.point);
     }
 
     onMouseDrag(event) {
-        const point = this.convertPoint(event.point);
-        if (this.path.lastSegment.point.equals(point) === false) {
-            this.path.add(/*this.rect.position = */point);
+        if (this.path.lastSegment.point.equals(event.point) === false) {
+            this.path.add(event.point);
         }
     }
 
-    onMouseUp(event) {
-        this.path.flatten(10);
-    }
-
-    convertPoint(point) {
-        return point;
-        // const { _options: { tile_size } } = this.editor;
-        // const range = tile_size / 1;
-        // return {
-        //     x: Math.round(point.x / range) * range,
-        //     y: Math.round(point.y / range) * range
-        // };
+    onMouseUp() {
+        this.path.flatten(this.flattenBy);
+        this.emit('output', this.path);
     }
 
 }

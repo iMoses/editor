@@ -1,6 +1,6 @@
 import { observable, computed, action, observe } from 'mobx';
+import { Project, Layer } from './paper';
 import { register } from 'lib/ioc';
-import { Project } from './models';
 import * as tools from './tools';
 import { view } from 'paper';
 import _ from 'lodash';
@@ -17,9 +17,14 @@ export default class EditorController {
     @observable projects        = new Map;
     @observable activeProjectId = null;
 
-    constructor({ system }) {
+    constructor({ paper, system }) {
+        this.paper = paper;
         observe(this, this.update);
         system.on('resize', this.update);
+    }
+
+    get tool() {
+        return this.paper.tool;
     }
 
     get tools() {
@@ -38,11 +43,18 @@ export default class EditorController {
         return this.project && this.project.view || view;
     }
 
+    activateTool(name) {
+        if (this.tool.deactivate) {
+            this.tool.deactivate();
+        }
+        this.tools[name].activate();
+    }
+
     @action.bound
     createProject(projectId, element) {
         this.projects.set(
             this.activeProjectId = projectId,
-            new Project(element, this, tools)
+            new Project(element, this)
         );
     }
 

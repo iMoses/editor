@@ -1,8 +1,12 @@
-import { view, Group, Path, Symbol } from 'paper';
+import { Group, Path, Symbol } from 'paper';
 
-export default class SquareGrid {
+export default class SquareGrid extends Group {
 
-    static tileSize = 32;
+    static VERTICAL = 1;
+    static BOLD     = 2;
+
+    static tileSize     = 32;
+    static boldAfter    = 5;
 
     static adjust(val) {
         return val - val % SquareGrid.tileSize;
@@ -13,37 +17,43 @@ export default class SquareGrid {
             val > 0
                 ? -Math.floor(val / SquareGrid.tileSize)
                 : Math.floor(val / -SquareGrid.tileSize)
-        ) % 5;
-        return offset < 0 ? 5 + offset : offset;
+        ) % SquareGrid.boldAfter;
+        return offset < 0 ? offset + SquareGrid.boldAfter : offset;
     }
 
-    constructor(project, strokeColor = 'rgb(0, 0, 213)') {
-        this.project     = project;
-        this.strokeColor = strokeColor;
-        this.update();
-    }
-
-    LineSymbol(vertical = false, strong = false) {
-        const { width, height } = this.project.view.bounds;
+    static createSymbol({
+        width,
+        height,
+        vertical    = false,
+        bold        = false,
+        strokeColor = 'rgb(0, 0, 213)',
+    }) {
         return new Symbol(
             new Path.Line({
                 from:        [0, 0],
                 to:          vertical ? [0, height] : [width, 0],
-                opacity:     strong ? .2 : .1,
-                strokeColor: this.strokeColor,
+                opacity:     bold ? .2 : .1,
+                strokeColor,
             }),
             true
         );
     }
 
-    update() {
-        const { width, height, left, top } = this.project.view.bounds;
-        const { adjust, offset, tileSize } = this.constructor;
+    update({ width, height, left, top }, { color: strokeColor } = {}) {
+        const { VERTICAL, BOLD, tileSize, boldAfter, adjust, offset, createSymbol } = this.constructor;
 
-        const vSymbol     = this.LineSymbol(true);
-        const hSymbol     = this.LineSymbol(false);
-        const vSymbolBold = this.LineSymbol(true, true);
-        const hSymbolBold = this.LineSymbol(false, true);
+        const lineSymbol = flags => createSymbol({
+            vertical:   flags & VERTICAL,
+            bold:       flags & BOLD,
+            width,
+            height,
+            strokeColor,
+        });
+
+        const vSymbol     = lineSymbol(VERTICAL);
+        const hSymbol     = lineSymbol();
+        const vSymbolBold = lineSymbol(VERTICAL | BOLD);
+        const hSymbolBold = lineSymbol(BOLD);
 
         const cols = Math.ceil(width / tileSize) + 1;
         const rows = Math.ceil(height / tileSize) + 1;
@@ -55,21 +65,21 @@ export default class SquareGrid {
 
         for (let i = 0; i < cols; i++) {
             children.push(
-                (i % 5 === vOffset ? vSymbolBold : vSymbol).place([ adjust(left) + i * tileSize, top  ])
+                (i % boldAfter === vOffset ? vSymbolBold : vSymbol).place([ adjust(left) + i * tileSize, top  ])
             );
         }
 
         for (let i = 0; i < rows; i++) {
             children.push(
-                (i % 5 === hOffset ? hSymbolBold : hSymbol).place([ left, adjust(top) + i * tileSize ])
+                (i % boldAfter === hOffset ? hSymbolBold : hSymbol).place([ left, adjust(top) + i * tileSize ])
             );
         }
 
-        if (this.group) {
-            this.group.remove();
+        if (this.hasChildren()) {
+            this.removeChildren();
         }
 
-        return this.group = new Group(children);
+        this.addChildren(children);
     }
 
 }

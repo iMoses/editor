@@ -27,7 +27,7 @@ export default class CommandsController extends EventEmitter {
     }
 
     @computed
-    get serialized() {
+    get json() {
         const { id, payload } = this.context;
         return {id, payload};
     }
@@ -38,7 +38,7 @@ export default class CommandsController extends EventEmitter {
             this.context.payload !== payload) {
             this.context.id      = contextId;
             this.context.payload = payload;
-            this.emit('change', this.serialized, this.system);
+            this.emit('change', this.json, this.system);
         }
         return this;
     }
@@ -65,7 +65,7 @@ export default class CommandsController extends EventEmitter {
         return payload => this.emit(command.id, {
             command,
             payload,
-            context:   this.serialized,
+            context:   this.json,
             selection: window.getSelection(),
         }, this.system);
     }

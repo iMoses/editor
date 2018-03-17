@@ -1,34 +1,10 @@
+import { intersection, castRay } from '../math';
 import { Group, Path, Segment } from 'paper';
-import { intersection } from '../math';
 import BaseTool from './base';
 
 export default class LightSourceTool extends BaseTool {
 
-    static castRay(point, angle) {
-        const dx = Math.cos(angle);
-        const dy = Math.sin(angle);
-        return {a: point, b: {x: point.x + dx, y: point.y + dy}};
-    }
-
-    constructor() {
-        super(...arguments);
-
-        this.group = new Group([
-            this.path = new Path.Circle({
-                name: 'light-tool',
-                radius: 20,
-                center: this.editor.view.center,
-                fillColor: 'rgb(250, 250, 210)'
-            })
-        ]);
-    }
-
-    onMouseMove(event) {
-        this.path.position = event.point;
-        this.lightOfSight(this.editor.tools.draw.lines);
-    }
-
-    removeDuplicatePoints(points) {
+    static removeDuplicatePoints(points) {
         let map = {};
         return points.filter(point => {
             let key = point.x + ',' + point.y;
@@ -37,9 +13,29 @@ export default class LightSourceTool extends BaseTool {
         });
     }
 
-    lightOfSight(lines) {
-        const { center }        = this.path.bounds;
-        const { width, height } = this.editor.view.bounds;
+    onActivate() {
+        this.path = new Path.Circle({
+            name: 'light-source',
+            radius: 20,
+            fillColor: 'rgb(250, 250, 210)',
+            center: this.editor.view.center,
+            parent: this.editor.project.layers.tools,
+        });
+    }
+
+    onDeactivate() {
+        this.group.remove();
+        this.path.remove();
+        delete this.path;
+    }
+
+    onMouseMove(event) {
+        this.path.position = event.point;
+        this.lineOfSight(this.editor.project.layers.walls);
+    }
+
+    lineOfSight(lines) {
+        const { center } = this.path.bounds;
 
         const angles     = [];
         const points     = [];
@@ -47,16 +43,16 @@ export default class LightSourceTool extends BaseTool {
 
         let segments = [];
 
-        if (this.lines) {
-            this.lines.remove();
+        if (this.group) {
+            this.group.remove();
         }
 
         // TODO: remove failsafe
         if (!center.isInside(this.editor.view.bounds)) return;
 
-        this.lines = new Group(this.editor.project.boundaries);
+        this.group = this.editor.project.boundaries.clone();
 
-        lines.children.concat(this.lines.children).forEach(path => {
+        lines.children.concat(this.group.children).forEach(path => {
             const { length } = path.segments;
             path.segments.forEach((segment, i) => {
                 if (i +1 !== length) {
@@ -66,7 +62,7 @@ export default class LightSourceTool extends BaseTool {
             });
         });
 
-        this.removeDuplicatePoints(points).forEach(point => {
+        LightSourceTool.removeDuplicatePoints(points).forEach(point => {
             point.angle = point.subtract(center).angle;
             angles.push(
                 point.angleInRadians -0.0001,
@@ -77,7 +73,7 @@ export default class LightSourceTool extends BaseTool {
         angles.forEach(angle => {
             let closestIntersect = null;
             segments.forEach(segment => {
-                let intersect = intersection(LightSourceTool.castRay(center, angle), segment);
+                let intersect = intersection(castRay(center, angle), segment);
                 if (intersect && (!closestIntersect || intersect.param < closestIntersect.param)) {
                     closestIntersect = intersect;
                 }
@@ -93,7 +89,7 @@ export default class LightSourceTool extends BaseTool {
             .sort((a, b) => a.angleInRadians - b.angleInRadians)
             .map(intersect => new Segment({point: [intersect.x, intersect.y]}));
 
-        this.lines.addChild(new Path({
+        this.group.addChild(new Path({
             fillColor: 'rgba(250, 250, 210, .4)',
             segments
         }));

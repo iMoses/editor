@@ -10,7 +10,7 @@ export default class Collection {
     }
 
     @computed
-    get serialized() {
+    get json() {
         return toJS(this.entries);
     }
 

@@ -1,6 +1,7 @@
-import { Group, Layer, Project, Path, Point, Segment, Size, Symbol, PointText } from 'paper';
+import { Group, Layer, Project, Path, Point, Size } from 'paper';
 import { observable, computed, action } from 'mobx';
 import { SquareGrid } from 'modules/editor/view';
+import { mouseDrag } from 'lib/utils';
 
 export default class ProjectModel extends Project {
 
@@ -10,10 +11,21 @@ export default class ProjectModel extends Project {
 
     @observable.ref center;
 
-    constructor(element, settings) {
+    constructor(element, editor) {
         super(element);
 
-        this.grid = new SquareGrid(this);
+        this.editor = editor;
+
+        new Layer({
+            name: 'tools',
+            children: [
+                new SquareGrid({name: 'grid'}),
+            ],
+        });
+
+        new Layer({name: 'tiles'});
+        new Layer({name: 'tokens'});
+        new Layer({name: 'walls'});
 
         this.handleResize({size: this.view.bounds});
 
@@ -22,26 +34,48 @@ export default class ProjectModel extends Project {
             mousedown: this.handleMouseDown,
         });
 
-        this.update(settings);
+        editor.tools.draw
+            .on('output', p => console.log(p));
+
+        this.update();
+    }
+
+    get grid() {
+        return this.layers.tools.children.grid;
+    }
+
+    exportSVG(options) {
+        const { tiles, tokens, walls } = this.layers;
+        const document = new Project([
+            tiles, tokens, walls
+        ]);
+        const svg = document.exportSVG(options);
+        document.remove();
+        this.activate();
+        return svg;
     }
 
     @computed
     get boundaries() {
         const { width, height } = this;
-        return [
-            new Path.Line({from: [0, 0], to: [width, 0], visible: false}),
-            new Path.Line({from: [width, 0], to: [width, height], visible: false}),
-            new Path.Line({from: [width, height], to: [0, height], visible: false}),
-            new Path.Line({from: [0, height], to: [0, 0], visible: false})
-        ];
+        return new Group({
+            name: 'boundaries',
+            parent: this.layers.tools,
+            children: [
+                new Path.Line({from: [0, 0], to: [width, 0], visible: false}),
+                new Path.Line({from: [width, 0], to: [width, height], visible: false}),
+                new Path.Line({from: [width, height], to: [0, height], visible: false}),
+                new Path.Line({from: [0, height], to: [0, 0], visible: false})
+            ],
+        });
     }
 
-    update({ tools: { draw } }) {
+    update() {
         const { offsetWidth, offsetHeight } = this.view.element;
 
         this.setSize(offsetWidth, offsetHeight);
 
-        this.grid.update();
+        this.grid.update(this.view.bounds);
         this.view.update();
     }
 
@@ -89,22 +123,14 @@ export default class ProjectModel extends Project {
 
         if (!event.modifiers.space) return true;
 
+        this.editor.tools.nil.activate();
         let last = this.view.projectToView(event.point);
-
-        const handleMouseDrag = event => {
+        mouseDrag(this.view, event => {
             const point = this.view.projectToView(event.point);
             this.view.translate(event.point.subtract(this.view.viewToProject(last)));
-            this.grid.update();
+            this.grid.update(this.view.bounds);
             last = point;
-        };
-
-        const handleMouseUp = () => {
-            this.view.off('mousedrag', handleMouseDrag);
-            this.view.off('mouseup', handleMouseUp);
-        };
-
-        this.view.on('mousedrag', handleMouseDrag);
-        this.view.on('mouseup', handleMouseUp);
+        }, () => this.editor.tools.nil.restore());
     }
 
 }

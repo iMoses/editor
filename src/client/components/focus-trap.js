@@ -75,10 +75,14 @@ export default class FocusTrap extends Component {
 
     render() {
         const { component: Component, onFocusEnter, onFocusLeave, ...props } = this.props;
-        return <Component ref={component => this.component = component}
-                          tabIndex="-1" {...props}
-                          onBlur={e => this.handleBlur(e)}
-                          onFocus={e => this.handleFocus(e)}/>;
+        return (
+            <Component
+                tabIndex="-1" {...props}
+                onBlur={e => this.handleBlur(e)}
+                onFocus={e => this.handleFocus(e)}
+                ref={component => this.component = component}
+            />
+        );
     }
 
 }
