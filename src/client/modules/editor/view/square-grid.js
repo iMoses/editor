@@ -39,6 +39,10 @@ export default class SquareGrid extends Group {
         );
     }
 
+    constructor() {
+        super(...arguments);
+    }
+
     update({ width, height, left, top }, { color: strokeColor } = {}) {
         const { VERTICAL, BOLD, tileSize, boldAfter, adjust, offset, createSymbol } = this.constructor;
 

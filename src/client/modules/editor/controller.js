@@ -1,6 +1,6 @@
 import { observable, computed, action, observe } from 'mobx';
-import { Project, Layer } from './paper';
 import { register } from 'lib/ioc';
+import { Project } from './paper';
 import * as tools from './tools';
 import { view } from 'paper';
 import _ from 'lodash';
@@ -60,14 +60,18 @@ export default class EditorController {
 
     @action.bound
     handleZoomEvent(event) {
-        const project = this.project;
+        const { project, view } = this;
         const { minZoom, maxZoom } = this.constructor;
-        const zoom = project.view.zoom + (event.deltaY > 0 ? .05 : -.05);
+        const zoom = _.clamp(view.zoom + (event.deltaY > 0 ? -.05 : .05), minZoom, maxZoom);
 
-        project.adjustZoom(
-            Math.max(Math.min(zoom, maxZoom), minZoom),
-            project.view.getEventPoint(event)
+        if (zoom === view.zoom) return;
+
+        view.center = view.center.subtract(
+            view.center
+                .subtract(view.getEventPoint(event))
+                .multiply(zoom - view.zoom)
         );
+        view.zoom = zoom;
 
         project.update(this);
     }

@@ -1,38 +1,37 @@
 import { Group, Layer, Project, Path, Point, Size } from 'paper';
-import { observable, computed, action } from 'mobx';
+import { observable, computed, action, observe } from 'mobx';
 import { SquareGrid } from 'modules/editor/view';
 import { mouseDrag } from 'lib/utils';
+import _ from 'lodash';
 
 export default class ProjectModel extends Project {
 
     // canvas size
+    @observable top;
+    @observable left;
     @observable width;
     @observable height;
-
-    @observable.ref center;
 
     constructor(element, editor) {
         super(element);
 
         this.editor = editor;
 
-        new Layer({
-            name: 'tools',
-            children: [
+        // base create layers
+        ['tiles', 'tokens', 'tools', 'walls']
+            .forEach(name => new Layer({name}));
+
+        this.layers.tools
+            .addChildren([
                 new SquareGrid({name: 'grid'}),
-            ],
-        });
-
-        new Layer({name: 'tiles'});
-        new Layer({name: 'tokens'});
-        new Layer({name: 'walls'});
-
-        this.handleResize({size: this.view.bounds});
+            ]);
 
         this.view.on({
-            resize:    this.handleResize,
+            resize:    this.handleResize.bind(this),
             mousedown: this.handleMouseDown,
         });
+
+        observe(this, this.update.bind(this));
 
         editor.tools.draw
             .on('output', p => console.log(p));
@@ -42,6 +41,56 @@ export default class ProjectModel extends Project {
 
     get grid() {
         return this.layers.tools.children.grid;
+    }
+
+    @computed
+    get boundaries() {
+        const { top, left, width, height } = this;
+        const leftWith = left + width;
+        const topHeight = top + height;
+        return new Group({
+            name: 'boundaries',
+            parent: this.layers.tools,
+            children: [
+                new Path.Line({from: [left, top], to: [leftWith, top], visible: false}),
+                new Path.Line({from: [leftWith, top], to: [leftWith, topHeight], visible: false}),
+                new Path.Line({from: [leftWith, topHeight], to: [left, topHeight], visible: false}),
+                new Path.Line({from: [left, topHeight], to: [left, top], visible: false}),
+            ],
+        });
+    }
+
+    update() {
+        if (this.requestId) return;
+        this.requestId = requestAnimationFrame(() => {
+            this.grid.update(this.view.bounds);
+            this.handleResize();
+            // console.log(_.mapValues(this.editor.tools, tool => _.result(tool, 'update')));
+            try {
+                this.editor.tools.lightSource.update();
+            }
+            catch (e) {}
+            this.view.update();
+            delete this.requestId;
+        });
+    }
+
+    handleResize() {
+        const {
+            size: { width, height },
+            element: { offsetWidth, offsetHeight }
+        } = this.view;
+        if (width !== offsetWidth || height !== offsetHeight) {
+            this.view.viewSize = new Size(offsetWidth, offsetHeight);
+        }
+        this.updateBounds();
+    }
+
+    setSize(width, height) {
+        const { size } = this.view;
+        if (width !== size.width || height !== size.height) {
+            this.view.viewSize = new Size(width, height);
+        }
     }
 
     exportSVG(options) {
@@ -55,65 +104,13 @@ export default class ProjectModel extends Project {
         return svg;
     }
 
-    @computed
-    get boundaries() {
-        const { width, height } = this;
-        return new Group({
-            name: 'boundaries',
-            parent: this.layers.tools,
-            children: [
-                new Path.Line({from: [0, 0], to: [width, 0], visible: false}),
-                new Path.Line({from: [width, 0], to: [width, height], visible: false}),
-                new Path.Line({from: [width, height], to: [0, height], visible: false}),
-                new Path.Line({from: [0, height], to: [0, 0], visible: false})
-            ],
-        });
-    }
-
-    update() {
-        const { offsetWidth, offsetHeight } = this.view.element;
-
-        this.setSize(offsetWidth, offsetHeight);
-
-        this.grid.update(this.view.bounds);
-        this.view.update();
-    }
-
-    setSize(width, height) {
-        if (width !== this.width || height !== this.height) {
-            this.view.viewSize = new Size(width, height);
-        }
-    }
-
-    adjustZoom(zoomValue, zoomCenter) {
-        let { bounds, center, viewSize, zoom } = this.view;
-
-        this.view.zoom = zoomValue;
-
-        const scale        = zoom / zoomValue;
-        const centerAdjust = zoomCenter.subtract(center);
-        const offset       = zoomCenter.subtract(centerAdjust.multiply(scale)).subtract(center);
-
-        center = this.view.center = center.add(offset);
-        bounds = this.view.bounds;
-
-        if (bounds.x < 0) this.view.center = center.subtract(new Point(bounds.x, 0));
-        if (bounds.y < 0) this.view.center = center.subtract(new Point(0, bounds.y));
-
-        bounds = this.view.bounds;
-
-        const
-            w = bounds.x + bounds.width,
-            h = bounds.y + bounds.height;
-
-        if (w > viewSize.width)  this.view.center = center.subtract(new Point(w - viewSize.width, 0));
-        if (h > viewSize.height) this.view.center = center.subtract(new Point(0, h - viewSize.height));
-    }
-
     @action.bound
-    handleResize({ size: { width, height } }) {
-        this.width  = width;
-        this.height = height;
+    updateBounds() {
+        const { width, height, x: left, y: top } = this.view.bounds;
+        (this.width === width)   || (this.width = width);
+        (this.height === height) || (this.height = height);
+        (this.left === left)     || (this.left = left);
+        (this.top === top)       || (this.top = top);
     }
 
     @action.bound
@@ -130,7 +127,10 @@ export default class ProjectModel extends Project {
             this.view.translate(event.point.subtract(this.view.viewToProject(last)));
             this.grid.update(this.view.bounds);
             last = point;
-        }, () => this.editor.tools.nil.restore());
+        }, () => {
+            this.editor.tools.nil.restore();
+            this.update();
+        });
     }
 
 }

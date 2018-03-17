@@ -1,4 +1,4 @@
-export default function calcIntersection(ray, segment){
+export function intersection(ray, segment){
     // RAY in parametric: Point + Delta*T1
     const r_px = ray.a.x;
     const r_py = ray.a.y;

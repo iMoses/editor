@@ -1,5 +1,6 @@
 import { Component, cssModules, inject } from 'lib/react';
 import ContextArea from 'widgets/context-area';
+import call from 'lib/rtc';
 
 @inject(({ system, controllers: { editor } }) => ({
     editor,
@@ -15,6 +16,8 @@ export default class EditorCanvas extends Component {
 
         window.editor = editor;
         window.paper = system.di.paper;
+
+        // call();
     }
 
     handleWheel(event) {

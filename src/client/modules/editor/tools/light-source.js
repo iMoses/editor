@@ -31,6 +31,10 @@ export default class LightSourceTool extends BaseTool {
 
     onMouseMove(event) {
         this.path.position = event.point;
+        this.update();
+    }
+
+    update() {
         this.lineOfSight(this.editor.project.layers.walls);
     }
 
@@ -50,7 +54,7 @@ export default class LightSourceTool extends BaseTool {
         // TODO: remove failsafe
         if (!center.isInside(this.editor.view.bounds)) return;
 
-        this.group = this.editor.project.boundaries.clone();
+        this.group = this.editor.project.boundaries;
 
         lines.children.concat(this.group.children).forEach(path => {
             const { length } = path.segments;
