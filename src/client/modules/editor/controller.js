@@ -17,18 +17,25 @@ export default class EditorController {
     @observable projects        = new Map;
     @observable activeProjectId = null;
 
+    @observable.ref tool;
+
     constructor({ paper, system }) {
         this.paper = paper;
         observe(this, this.update);
         system.on('resize', this.update);
     }
 
-    get tool() {
-        return this.paper.tool;
+    @computed
+    get toolName() {
+        return _.kebabCase(_.findKey(this.tools, this.tool));
     }
 
     get tools() {
+        const createListener = tool => action(
+            ({ newValue: active }) => active && (this.tool = tool)
+        );
         const value = _.mapValues(tools, Tool => new Tool(this));
+        _.each(value, tool => observe(tool, 'active', createListener(tool)));
         Object.defineProperty(this, 'tools', {value});
         return value;
     }

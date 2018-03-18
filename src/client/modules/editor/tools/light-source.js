@@ -16,17 +16,16 @@ export default class LightSourceTool extends BaseTool {
     onActivate() {
         this.path = new Path.Circle({
             name: 'light-source',
-            radius: 20,
+            radius: 16,
             fillColor: 'rgb(250, 250, 210)',
-            center: this.editor.view.center,
-            parent: this.editor.project.layers.tools,
+            parent: this.baseLayer,
         });
     }
 
     onDeactivate() {
-        this.group.remove();
+        this.group && this.group.remove();
         this.path.remove();
-        delete this.path;
+        this.path = null;
     }
 
     onMouseMove(event) {
@@ -35,7 +34,7 @@ export default class LightSourceTool extends BaseTool {
     }
 
     update() {
-        this.lineOfSight(this.editor.project.layers.walls);
+        this.lineOfSight(this.layers.walls);
     }
 
     lineOfSight(lines) {

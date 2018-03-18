@@ -2,6 +2,7 @@ import { Group, Layer, Project, Path, Point, Size } from 'paper';
 import { observable, computed, action, observe } from 'mobx';
 import { SquareGrid } from 'modules/editor/view';
 import { mouseDrag } from 'lib/utils';
+import fp from 'lodash/fp';
 import _ from 'lodash';
 
 export default class ProjectModel extends Project {
@@ -18,7 +19,7 @@ export default class ProjectModel extends Project {
         this.editor = editor;
 
         // base create layers
-        ['tiles', 'tokens', 'tools', 'walls']
+        ['light', 'tiles', 'tokens', 'tools', 'walls']
             .forEach(name => new Layer({name}));
 
         this.layers.tools
@@ -26,15 +27,14 @@ export default class ProjectModel extends Project {
                 new SquareGrid({name: 'grid'}),
             ]);
 
+        this.setupTools();
+
         this.view.on({
             resize:    this.handleResize.bind(this),
             mousedown: this.handleMouseDown,
         });
 
         observe(this, this.update.bind(this));
-
-        editor.tools.draw
-            .on('output', p => console.log(p));
 
         this.update();
     }
@@ -60,11 +60,21 @@ export default class ProjectModel extends Project {
         });
     }
 
+    setupTools() {
+        const { tools } = this.editor;
+
+        const extractNewValue = res => res.newValue;
+
+        const addWall = fp.flow(extractNewValue, p => this.layers.walls.addChild(p));
+
+        tools.draw.observe('lastPath', addWall);
+    }
+
     update() {
         if (this.requestId) return;
         this.requestId = requestAnimationFrame(() => {
-            this.grid.update(this.view.bounds);
             this.handleResize();
+            this.grid.update(this.view.bounds);
             // console.log(_.mapValues(this.editor.tools, tool => _.result(tool, 'update')));
             try {
                 this.editor.tools.lightSource.update();
@@ -73,6 +83,37 @@ export default class ProjectModel extends Project {
             this.view.update();
             delete this.requestId;
         });
+    }
+
+    @action.bound
+    updateBounds() {
+        const { width, height, x: left, y: top } = this.view.bounds;
+        (this.width === width)   || (this.width = width);
+        (this.height === height) || (this.height = height);
+        (this.left === left)     || (this.left = left);
+        (this.top === top)       || (this.top = top);
+    }
+
+    exportSVG(options = { asString: true }) {
+        const { tiles, tokens, walls } = this.layers;
+        const doc = new Project(document.createElement('canvas'));
+        const layers = [tiles, tokens, walls];
+
+        layers.forEach(l => doc.addLayer(l));
+        // TODO viewSize should be the full size of the document
+
+        doc.view.viewSize = this.view.viewSize;
+
+        const svg = doc.exportSVG(options);
+
+        layers.forEach(l => this.addLayer(l));
+
+        this.activate();
+        doc.remove();
+
+        return typeof svg === 'string'
+            ? `data:image/svg+xml;base64,${btoa(svg)}`
+            : svg;
     }
 
     handleResize() {
@@ -84,33 +125,6 @@ export default class ProjectModel extends Project {
             this.view.viewSize = new Size(offsetWidth, offsetHeight);
         }
         this.updateBounds();
-    }
-
-    setSize(width, height) {
-        const { size } = this.view;
-        if (width !== size.width || height !== size.height) {
-            this.view.viewSize = new Size(width, height);
-        }
-    }
-
-    exportSVG(options) {
-        const { tiles, tokens, walls } = this.layers;
-        const document = new Project([
-            tiles, tokens, walls
-        ]);
-        const svg = document.exportSVG(options);
-        document.remove();
-        this.activate();
-        return svg;
-    }
-
-    @action.bound
-    updateBounds() {
-        const { width, height, x: left, y: top } = this.view.bounds;
-        (this.width === width)   || (this.width = width);
-        (this.height === height) || (this.height = height);
-        (this.left === left)     || (this.left = left);
-        (this.top === top)       || (this.top = top);
     }
 
     @action.bound

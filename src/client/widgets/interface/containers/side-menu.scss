@@ -1,0 +1,12 @@
+.side-menu {
+  margin: .5rem 0;
+
+  > div {
+    padding: .5rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(#000, .05);
+    }
+  }
+}

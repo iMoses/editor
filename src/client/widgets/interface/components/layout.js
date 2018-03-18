@@ -22,13 +22,19 @@ export default class DefaultLayout extends Component {
                     <FileMenu contexts={[
                         system.EDIT,
                         system.VIEW,
+                        system.TOOLS,
                         system.HELP,
                     ]} />
                 </header>
 
                 <section className="main-screen">
-                    <ContextArea component={EditorCanvas} autoFocus />
+
+                    <section>
+                        <EditorCanvas />
+                    </section>
+
                     <SideMenu />
+
                 </section>
 
                 <footer>

@@ -1,4 +1,4 @@
-import { observable, computed, action } from 'mobx';
+import { observable, computed, action, observe } from 'mobx';
 import { Tool } from 'paper';
 import fp from 'lodash/fp';
 import _ from 'lodash';
@@ -50,6 +50,22 @@ export default class BaseTool extends Tool {
             ),
             fp.pickBy(fp.isFunction),
         )(BaseTool.handlersMap));
+    }
+
+    get layers() {
+        return this.editor.project.layers;
+    }
+
+    get baseLayer() {
+        return this.layers.tools;
+    }
+
+    activate() {
+        this.active || super.activate();
+    }
+
+    observe(...args) {
+        return observe(this, ...args);
     }
 
 }

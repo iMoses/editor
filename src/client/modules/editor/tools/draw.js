@@ -9,26 +9,38 @@ export default class DrawTool extends BaseTool {
 
     @observable flattenBy = 10;
 
+    @observable.ref lastPath;
+
     @computed
-    get style() {
+    get options() {
         const { strokeColor, strokeWidth } = this;
-        return {strokeColor, strokeWidth};
+        return {strokeColor, strokeWidth, parent: this.baseLayer};
     }
 
+    @action
     onMouseDown(event) {
-        this.path = new Path(this.style);
-        this.path.add(event.point);
+        if (event.event.which === 1) {
+            this.path = new Path(this.options);
+            this.path.add(event.point);
+        }
+        else {
+            this.path = null;
+        }
     }
 
     onMouseDrag(event) {
-        if (this.path.lastSegment.point.equals(event.point) === false) {
+        if (this.path && this.path.lastSegment.point.equals(event.point) === false) {
             this.path.add(event.point);
         }
     }
 
+    @action
     onMouseUp() {
-        this.path.flatten(this.flattenBy);
-        this.emit('output', this.path);
+        if (this.path) {
+            this.path.flatten(this.flattenBy);
+            this.emit('output', this.path);
+            this.lastPath = this.path;
+        }
     }
 
 }

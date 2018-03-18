@@ -1,9 +1,12 @@
 import * as commands from '../commands';
 import * as editor from '../../editor';
 
-export const EDIT = 'system.file-menu.edit';
-export const VIEW = 'system.file-menu.view';
-export const HELP = 'system.file-menu.help';
+export const EDIT  = 'system.file-menu.edit';
+export const VIEW  = 'system.file-menu.view';
+export const HELP  = 'system.file-menu.help';
+
+export * from '../../editor';
+
 
 export default [
     {
