@@ -21,7 +21,9 @@ export default [
         groups: [
             {
                 items: [
-                    commands.TOGGLE_GRID,
+                    commands.ACTIVATE_DRAW,
+                    commands.ACTIVATE_SELECT,
+                    commands.ACTIVATE_LIGHT_SOURCE,
                 ],
             },
         ],

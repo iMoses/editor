@@ -6,7 +6,7 @@ export default [
     {
         id:    ACTIVATE_DRAW,
         title: 'D_raw',
-        suggestedKeys: 'ctrl shift d',
+        suggestedKeys: 'alt d',
         onExecute(ctx, { controllers: { editor } }) {
             editor.tools.draw.activate();
         },
@@ -14,7 +14,7 @@ export default [
     {
         id:    ACTIVATE_SELECT,
         title: 'S_elect',
-        suggestedKeys: 'ctrl shift s',
+        suggestedKeys: 'alt s',
         onExecute(ctx, { controllers: { editor } }) {
             editor.tools.select.activate();
         },
@@ -22,7 +22,7 @@ export default [
     {
         id:    ACTIVATE_LIGHT_SOURCE,
         title: 'L_ight Source',
-        suggestedKeys: 'ctrl shift l',
+        suggestedKeys: 'alt a',
         onExecute(ctx, { controllers: { editor } }) {
             editor.tools.lightSource.activate();
         },

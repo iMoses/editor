@@ -1,6 +1,6 @@
 import { observable, computed, action, observe } from 'mobx';
 import { register } from 'lib/ioc';
-import { Project } from './paper';
+import { Project } from './models';
 import * as tools from './tools';
 import { view } from 'paper';
 import _ from 'lodash';

@@ -1,4 +1,5 @@
 import { Component, PropTypes, cssModules, observer, inject } from 'lib/react';
+import { ContextMenuRoot } from 'widgets/context-area';
 import MenuButton from '../components/menu-button';
 import HotKeys from 'components/hot-keys';
 
@@ -51,10 +52,9 @@ export default class FileMenu extends Component {
             this.reset();
         }
         else if (id) {
-            // if (this.system.contextMenu === false) {
-            this.activeElement = document.activeElement;
-            // }
+            this.activeElement = ContextMenuRoot.activeElement || document.activeElement;
             this.setState({activeId: id, focus: true});
+            ContextMenuRoot.activeElement = null;
         }
     }
 

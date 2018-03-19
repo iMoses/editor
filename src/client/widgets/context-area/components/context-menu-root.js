@@ -20,11 +20,13 @@ export default class ContextMenuRoot extends Component {
         close:    'esc',
         select:   ['enter', 'space'],
     };
+    
+    static activeElement;
 
     constructor(props) {
         super(...arguments);
         this.state = {style: props.style};
-        this.activeElement = document.activeElement;
+        ContextMenuRoot.activeElement = document.activeElement;
     }
 
     componentDidMount() {
@@ -46,7 +48,7 @@ export default class ContextMenuRoot extends Component {
             },
         });
         if (menuNode !== document.activeElement) {
-            this.activeElement = document.activeElement;
+            ContextMenuRoot.activeElement = document.activeElement;
             this.contextMenu.clear();
         }
     }
@@ -55,13 +57,17 @@ export default class ContextMenuRoot extends Component {
         if (this.props.onClose) {
             this.props.onClose();
         }
-        this.activeElement.focus();
+        if (ContextMenuRoot.activeElement) {
+            ContextMenuRoot.activeElement.focus();
+            ContextMenuRoot.activeElement = null;
+        }
     };
 
     render() {
         const { state: { style }, props: { contextMenu } } = this;
         return ReactDOM.createPortal((
             <HotKeys
+                id="context-menu-root"
                 keyMap={ContextMenuRoot.keyMap}
                 onFocusLeave={this.handleClose}>
 

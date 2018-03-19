@@ -1,7 +1,7 @@
 import { Group, Layer, Project, Path, Point, Size } from 'paper';
 import { observable, computed, action, observe } from 'mobx';
-import { SquareGrid } from 'modules/editor/view';
-import { mouseDrag } from 'lib/utils';
+import { SquareGrid } from 'modules/editor/models';
+import { mouseDrag } from 'lib/utils/index';
 import fp from 'lodash/fp';
 import _ from 'lodash';
 
